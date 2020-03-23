@@ -1,3 +1,4 @@
+---
 language: go
 
 go:
@@ -7,12 +8,11 @@ services:
   - docker
 
 before_install:
-- docker build . --tag machacekondra/fakeovirt
-- docker run -e NAMESPACE=cdi-test -d -p 127.0.0.1:12346:12346 machacekondra/fakeovirt
-- docker ps -a
+  - docker build . --tag machacekondra/fakeovirt
+  - docker run -e NAMESPACE=cdi-test -d -p 127.0.0.1:12346:12346 machacekondra/fakeovirt
+  - docker ps -a
 
 script:
   - curl -k https://127.0.0.1:12346/namespace 2>/dev/null | jq .namespace | grep -q 'cdi-test'
   - curl -k https://127.0.0.1:12346/ovirt-engine/sso/oauth/token 2>/dev/null | jq .access_token | grep -q 'thessotoken'
-  - [ $(curl -k -s -o /dev/null -w '%{http_code}' https://127.0.0.1:12346/ovirt-engine/api/disks) -eq 200 ]
-  - [ $(curl -s -o /dev/null -w '%{http_code}' https://127.0.0.1:12346/ovirt-engine/api/disks) -eq 200 ]
+  - sh -c '[ $(curl -k -s -o /dev/null -w "%{http_code}" https://127.0.0.1:12346/ovirt-engine/api/disks/123) -eq 200 ]'
