@@ -28,6 +28,8 @@ func main() {
 
 	http.HandleFunc("/ovirt-engine/sso/oauth/token", SsoToken)
 	http.HandleFunc(apiEndpoint("disks/"), OvirtDisks)
+	http.HandleFunc(apiEndpoint("vms"), OvirtVms)
+	http.HandleFunc(apiEndpoint("vms/"), OvirtVM)
 	http.HandleFunc("/namespace", GetNamespace)
 	http.HandleFunc(apiEndpoint("imagetransfers/"), OvirtImageTransfers)
 	err := http.ListenAndServeTLS(":"+port, "server.crt", "server.key", nil)
@@ -56,6 +58,19 @@ func SsoToken(w http.ResponseWriter, r *http.Request) {
 
 	setContentType(w, jsonContentType)
 	w.Write([]byte("{\"access_token\":\"" + token + "\",\"scope\":\"\",\"exp\":\"9223372036854775807\",\"token_type\":\"bearer\"}"))
+}
+
+// OvirtVms host Vms endpotint
+func OvirtVms(w http.ResponseWriter, r *http.Request) {
+	setContentType(w, xmlContentType)
+	w.Write([]byte("<vms><vm id=\"123\"><name>cirrosvm</name><status>down</status></vm></vms>"))
+}
+
+// OvirtVM host Vms endpotint
+func OvirtVM(w http.ResponseWriter, r *http.Request) {
+	vmID := r.URL.Path[len(apiEndpoint("vms/")):]
+	setContentType(w, xmlContentType)
+	w.Write([]byte("<vm id=\"" + vmID + "\"><name>cirrosvm</name><status>down</status></vm>"))
 }
 
 // OvirtDisks host disks endpotint
