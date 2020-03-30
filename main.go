@@ -30,9 +30,10 @@ func main() {
 	http.HandleFunc(apiEndpoint("disks/"), OvirtDisks)
 	http.HandleFunc(apiEndpoint("vms"), OvirtVms)
 	http.HandleFunc(apiEndpoint("vms/"), OvirtVM)
+	http.HandleFunc(apiEndpoint("vms/123/diskattachments"), OvirtVMDisks)
 	http.HandleFunc("/namespace", GetNamespace)
 	http.HandleFunc(apiEndpoint("imagetransfers/"), OvirtImageTransfers)
-	err := http.ListenAndServeTLS(":"+port, "server.crt", "server.key", nil)
+	err := http.ListenAndServeTLS(":"+port, "imageio.crt", "server.key", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
@@ -63,14 +64,20 @@ func SsoToken(w http.ResponseWriter, r *http.Request) {
 // OvirtVms host Vms endpotint
 func OvirtVms(w http.ResponseWriter, r *http.Request) {
 	setContentType(w, xmlContentType)
-	w.Write([]byte("<vms><vm id=\"123\"><name>cirrosvm</name><status>down</status></vm></vms>"))
+	w.Write([]byte("<vms><vm id=\"123\"><link href=\"/ovirt-engine/api/vms/123/diskattachments\" rel=\"diskattachments\"/><name>cirrosvm</name><status>down</status></vm></vms>"))
 }
 
 // OvirtVM host Vms endpotint
 func OvirtVM(w http.ResponseWriter, r *http.Request) {
 	vmID := r.URL.Path[len(apiEndpoint("vms/")):]
 	setContentType(w, xmlContentType)
-	w.Write([]byte("<vm id=\"" + vmID + "\"><name>cirrosvm</name><status>down</status></vm>"))
+	w.Write([]byte("<vm id=\"" + vmID + "\"><name>cirrosvm</name><status>down</status><cpu><topology><cores>1</cores></topology></cpu></vm>"))
+}
+
+// OvirtVMDisks host Vms endpotint
+func OvirtVMDisks(w http.ResponseWriter, r *http.Request) {
+	setContentType(w, xmlContentType)
+	w.Write([]byte("<disk_attachments><disk_attachment id=\"123\"><name>cirros</name><bootable>true</bootable><interface>virtio</interface><disk href=\"/ovirt-engine/api/disks/123\" id=\"123\"/></disk_attachment></disk_attachments>"))
 }
 
 // OvirtDisks host disks endpotint
@@ -82,7 +89,7 @@ func OvirtDisks(w http.ResponseWriter, r *http.Request) {
 
 	diskID := r.URL.Path[len(apiEndpoint("disks/")):]
 	setContentType(w, xmlContentType)
-	w.Write([]byte("<disk id=\"" + diskID + "\"><total_size>" + diskSize + "</total_size></disk>"))
+	w.Write([]byte("<disk id=\"" + diskID + "\"><total_size>" + diskSize + "</total_size><provisioned_size>" + diskSize + "</provisioned_size></disk>"))
 }
 
 // OvirtImageTransfers host imagetransfer endpoint
