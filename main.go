@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 )
 
 const (
@@ -28,9 +30,11 @@ func main() {
 
 	http.HandleFunc("/ovirt-engine/sso/oauth/token", SsoToken)
 	http.HandleFunc(apiEndpoint("disks/"), OvirtDisks)
+	http.HandleFunc(apiEndpoint("storagedomains/"), OvirtStorageDomains)
 	http.HandleFunc(apiEndpoint("vms"), OvirtVms)
 	http.HandleFunc(apiEndpoint("vms/"), OvirtVM)
-	http.HandleFunc(apiEndpoint("vms/123/diskattachments"), OvirtVMDisks)
+	http.HandleFunc(apiEndpoint("vms/123/diskattachments"), OvirtVMSubresource)
+	http.HandleFunc(apiEndpoint("vms/123/graphicsconsoles"), OvirtVMSubresource)
 	http.HandleFunc("/namespace", GetNamespace)
 	http.HandleFunc(apiEndpoint("imagetransfers/"), OvirtImageTransfers)
 	err := http.ListenAndServeTLS(":"+port, "imageio.crt", "server.key", nil)
@@ -64,20 +68,43 @@ func SsoToken(w http.ResponseWriter, r *http.Request) {
 // OvirtVms host Vms endpotint
 func OvirtVms(w http.ResponseWriter, r *http.Request) {
 	setContentType(w, xmlContentType)
-	w.Write([]byte("<vms><vm id=\"123\"><link href=\"/ovirt-engine/api/vms/123/diskattachments\" rel=\"diskattachments\"/><name>cirrosvm</name><status>down</status></vm></vms>"))
+	content, err := ioutil.ReadFile("vms/123/content")
+	if err != nil {
+		w.Write([]byte("<error/>"))
+	}
+	w.Write([]byte("<vms>" + string(content) + "</vms>"))
 }
 
 // OvirtVM host Vms endpotint
 func OvirtVM(w http.ResponseWriter, r *http.Request) {
 	vmID := r.URL.Path[len(apiEndpoint("vms/")):]
 	setContentType(w, xmlContentType)
-	w.Write([]byte("<vm id=\"" + vmID + "\"><name>cirrosvm</name><status>down</status><cpu><topology><cores>1</cores></topology></cpu></vm>"))
+	content, err := ioutil.ReadFile("vms/" + vmID + "/content")
+	if err != nil {
+		w.Write([]byte("<error/>"))
+	}
+	w.Write(content)
 }
 
-// OvirtVMDisks host Vms endpotint
-func OvirtVMDisks(w http.ResponseWriter, r *http.Request) {
+func OvirtVMSubresource(w http.ResponseWriter, r *http.Request) {
+	vmID := r.URL.Path[len(apiEndpoint("vms/")):]
 	setContentType(w, xmlContentType)
-	w.Write([]byte("<disk_attachments><disk_attachment id=\"123\"><name>cirros</name><bootable>true</bootable><interface>virtio</interface><disk href=\"/ovirt-engine/api/disks/123\" id=\"123\"/></disk_attachment></disk_attachments>"))
+	content, err := ioutil.ReadFile("vms/" + vmID)
+	if err != nil {
+		w.Write([]byte("<error/>"))
+	}
+	w.Write(content)
+}
+
+// OvirtStorageDomains
+func OvirtStorageDomains(w http.ResponseWriter, r *http.Request) {
+	sdID := r.URL.Path[len(apiEndpoint("storagedomains/")):]
+	setContentType(w, xmlContentType)
+	content, err := ioutil.ReadFile("storagedomains/" + sdID + "/content")
+	if err != nil {
+		w.Write([]byte("<error/>"))
+	}
+	w.Write(content)
 }
 
 // OvirtDisks host disks endpotint
@@ -89,7 +116,11 @@ func OvirtDisks(w http.ResponseWriter, r *http.Request) {
 
 	diskID := r.URL.Path[len(apiEndpoint("disks/")):]
 	setContentType(w, xmlContentType)
-	w.Write([]byte("<disk id=\"" + diskID + "\"><total_size>" + diskSize + "</total_size><provisioned_size>" + diskSize + "</provisioned_size></disk>"))
+	content, err := ioutil.ReadFile("disks/" + diskID + "/content")
+	if err != nil {
+		w.Write([]byte("<error/>"))
+	}
+	w.Write([]byte(strings.ReplaceAll(string(content), "@DISKSIZE", diskSize)))
 }
 
 // OvirtImageTransfers host imagetransfer endpoint
