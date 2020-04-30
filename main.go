@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/gorilla/pat"
 )
 
 const (
@@ -28,16 +30,24 @@ func main() {
 		port = defaultPort
 	}
 
-	http.HandleFunc("/ovirt-engine/sso/oauth/token", SsoToken)
-	http.HandleFunc(apiEndpoint("disks/"), OvirtDisks)
-	http.HandleFunc(apiEndpoint("storagedomains/"), OvirtStorageDomains)
-	http.HandleFunc(apiEndpoint("vms"), OvirtVms)
-	http.HandleFunc(apiEndpoint("vms/"), OvirtVM)
-	http.HandleFunc(apiEndpoint("vms/123/diskattachments"), OvirtVMSubresource)
-	http.HandleFunc(apiEndpoint("vms/123/graphicsconsoles"), OvirtVMSubresource)
-	http.HandleFunc("/namespace", GetNamespace)
-	http.HandleFunc(apiEndpoint("imagetransfers/"), OvirtImageTransfers)
-	err := http.ListenAndServeTLS(":"+port, "imageio.crt", "server.key", nil)
+	mux := pat.New()
+	mux.HandleFunc("/ovirt-engine/sso/oauth/token", SsoToken)
+	mux.HandleFunc(apiEndpoint("vms"), OvirtVms)
+
+	mux.HandleFunc(apiEndpoint("vms/{id}"), OvirtResoruceHandler("vms"))
+	mux.HandleFunc(apiEndpoint("storagedomains/{id}"), OvirtResoruceHandler("storagedomains"))
+	mux.HandleFunc(apiEndpoint("vnicprofiles/{id}"), OvirtResoruceHandler("vnicprofiles"))
+	mux.HandleFunc(apiEndpoint("networks/{id}"), OvirtResoruceHandler("networks"))
+	mux.HandleFunc(apiEndpoint("disks/{id}"), OvirtDisks)
+
+	mux.HandleFunc(apiEndpoint("vms/{id}/diskattachments"), OvirtVMSubresource)
+	mux.HandleFunc(apiEndpoint("vms/{id}/graphicsconsoles"), OvirtVMSubresource)
+	mux.HandleFunc(apiEndpoint("vms/{id}/nics"), OvirtVMSubresource)
+
+	mux.HandleFunc("/namespace", GetNamespace)
+	mux.HandleFunc(apiEndpoint("imagetransfers"), OvirtImageTransfers)
+
+	err := http.ListenAndServeTLS(":"+port, "imageio.crt", "server.key", mux)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
@@ -67,23 +77,13 @@ func SsoToken(w http.ResponseWriter, r *http.Request) {
 
 // OvirtVms host Vms endpotint
 func OvirtVms(w http.ResponseWriter, r *http.Request) {
+	//TODO: add support for searching with name and cluster name
 	setContentType(w, xmlContentType)
 	content, err := ioutil.ReadFile("vms/123/content")
 	if err != nil {
 		w.Write([]byte("<error/>"))
 	}
 	w.Write([]byte("<vms>" + string(content) + "</vms>"))
-}
-
-// OvirtVM host Vms endpotint
-func OvirtVM(w http.ResponseWriter, r *http.Request) {
-	vmID := r.URL.Path[len(apiEndpoint("vms/")):]
-	setContentType(w, xmlContentType)
-	content, err := ioutil.ReadFile("vms/" + vmID + "/content")
-	if err != nil {
-		w.Write([]byte("<error/>"))
-	}
-	w.Write(content)
 }
 
 func OvirtVMSubresource(w http.ResponseWriter, r *http.Request) {
@@ -96,27 +96,28 @@ func OvirtVMSubresource(w http.ResponseWriter, r *http.Request) {
 	w.Write(content)
 }
 
-// OvirtStorageDomains
-func OvirtStorageDomains(w http.ResponseWriter, r *http.Request) {
-	sdID := r.URL.Path[len(apiEndpoint("storagedomains/")):]
-	setContentType(w, xmlContentType)
-	content, err := ioutil.ReadFile("storagedomains/" + sdID + "/content")
-	if err != nil {
-		w.Write([]byte("<error/>"))
+func OvirtResoruceHandler(resource string) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id := r.URL.Query().Get(":id")
+		setContentType(w, xmlContentType)
+		content, err := ioutil.ReadFile(resource + "/" + id + "/content")
+		if err != nil {
+			w.Write([]byte("<error/>"))
+		}
+		w.Write(content)
 	}
-	w.Write(content)
 }
 
-// OvirtDisks host disks endpotint
+// OvirtDisks host disks endpoint
 func OvirtDisks(w http.ResponseWriter, r *http.Request) {
 	diskSize, available := os.LookupEnv("DISKSIZE")
 	if !available {
 		diskSize = defaultSize
 	}
 
-	diskID := r.URL.Path[len(apiEndpoint("disks/")):]
+	id := r.URL.Query().Get(":id")
 	setContentType(w, xmlContentType)
-	content, err := ioutil.ReadFile("disks/" + diskID + "/content")
+	content, err := ioutil.ReadFile("disks/" + id + "/content")
 	if err != nil {
 		w.Write([]byte("<error/>"))
 	}
