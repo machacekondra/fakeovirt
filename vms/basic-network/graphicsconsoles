@@ -1,0 +1,20 @@
+<graphics_consoles>
+<graphics_console href="/ovirt-engine/api/vms/basic-network/graphicsconsoles/7370696365" id="7370696365">
+<actions>
+<link href="/ovirt-engine/api/vms/basic-network/graphicsconsoles/7370696365/ticket" rel="ticket"/>
+<link href="/ovirt-engine/api/vms/basic-network/graphicsconsoles/7370696365/proxyticket" rel="proxyticket"/>
+<link href="/ovirt-engine/api/vms/basic-network/graphicsconsoles/7370696365/remoteviewerconnectionfile" rel="remoteviewerconnectionfile"/>
+</actions>
+<protocol>spice</protocol>
+<vm href="/ovirt-engine/api/vms/basic-network" id="basic-network"/>
+</graphics_console>
+<graphics_console href="/ovirt-engine/api/vms/basic-network/graphicsconsoles/766e63" id="766e63">
+<actions>
+<link href="/ovirt-engine/api/vms/basic-network/graphicsconsoles/766e63/ticket" rel="ticket"/>
+<link href="/ovirt-engine/api/vms/basic-network/graphicsconsoles/766e63/proxyticket" rel="proxyticket"/>
+<link href="/ovirt-engine/api/vms/basic-network/graphicsconsoles/766e63/remoteviewerconnectionfile" rel="remoteviewerconnectionfile"/>
+</actions>
+<protocol>vnc</protocol>
+<vm href="/ovirt-engine/api/vms/basic-network" id="basic-network"/>
+</graphics_console>
+</graphics_consoles>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<network href="/ovirt-engine/api/networks/123" id="123">
+    <name>ovirtmgmt</name>
+    <description>Default Management Network</description>
+    <comment></comment>
+    <link href="/ovirt-engine/api/networks/123/permissions" rel="permissions"/>
+    <link href="/ovirt-engine/api/networks/123/vnicprofiles" rel="vnicprofiles"/>
+    <link href="/ovirt-engine/api/networks/123/networklabels" rel="networklabels"/>
+    <mtu>0</mtu>
+    <stp>false</stp>
+    <usages>
+        <usage>vm</usage>
+    </usages>
+    <data_center href="/ovirt-engine/api/datacenters/123" id="123"/>
+</network>
