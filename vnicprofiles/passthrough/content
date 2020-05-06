@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<vnic_profile href="/ovirt-engine/api/networks/123/vnicprofiles/pass-through" id="pass-through">
+    <name>vNIC-1</name>
+    <link href="/ovirt-engine/api/networks/123/vnicprofiles/pass-through/permissions" rel="permissions"/>
+    <pass_through>
+        <mode>enabled</mode>
+    </pass_through>
+    <port_mirroring>false</port_mirroring>
+    <network href="/ovirt-engine/api/networks/123" id="123"/>
+</vnic_profile>

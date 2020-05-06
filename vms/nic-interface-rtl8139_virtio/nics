@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<nics>
+    <nic href="/ovirt-engine/api/vms/nic-interface-rtl8139_virtio/nics/123" id="123">
+        <actions>
+            <link href="/ovirt-engine/api/vms/nic-interface-rtl8139_virtio/nics/123/deactivate" rel="deactivate"/>
+            <link href="/ovirt-engine/api/vms/nic-interface-rtl8139_virtio/nics/123/activate" rel="activate"/>
+        </actions>
+        <name>nic1</name>
+        <link href="/ovirt-engine/api/vms/nic-interface-rtl8139_virtio/nics/123/networkfilterparameters" rel="networkfilterparameters"/>
+        <link href="/ovirt-engine/api/vms/nic-interface-rtl8139_virtio/nics/123/reporteddevices" rel="reporteddevices"/>
+        <link href="/ovirt-engine/api/vms/nic-interface-rtl8139_virtio/nics/123/statistics" rel="statistics"/>
+        <vm href="/ovirt-engine/api/vms/nic-interface-rtl8139_virtio" id="nic-interface-rtl8139_virtio"/>
+        <interface>rtl8139_virtio</interface>
+        <linked>true</linked>
+        <mac>
+            <address>56:6f:05:0f:00:05</address>
+        </mac>
+        <plugged>true</plugged>
+        <reported_devices>
+            <reported_device href="/ovirt-engine/api/vms/nic-interface-rtl8139_virtio/reporteddevices/65746830-3536-3a36-663a-30353a30663a" id="65746830-3536-3a36-663a-30353a30663a">
+                <name>eth0</name>
+                <description>guest reported data</description>
+                <ips>
+                    <ip>
+                        <address>10.220.100.107</address>
+                        <version>v4</version>
+                    </ip>
+                    <ip>
+                        <address>fe80::546f:5ff:fe0f:5</address>
+                        <version>v6</version>
+                    </ip>
+                </ips>
+                <mac>
+                    <address>56:6f:05:0f:00:05</address>
+                </mac>
+                <type>network</type>
+            </reported_device>
+        </reported_devices>
+        <vnic_profile href="/ovirt-engine/api/vnicprofiles/123" id="123"/>
+    </nic>
+</nics>
