@@ -24,6 +24,10 @@ const (
 	defaultImageioImage   = "cirros"
 )
 
+var images = map[string]string{
+	"invalid": "invalid",
+}
+
 func main() {
 	port, available := os.LookupEnv("PORT")
 	if !available {
@@ -135,7 +139,7 @@ func OvirtImageTransfers(w http.ResponseWriter, r *http.Request) {
 		service = defaultImageioService
 
 	}
-	imageName, available := os.LookupEnv("IMAGENAME")
+	imageName, available := images[GetImageId(r)]
 	if !available {
 		imageName = defaultImageioImage
 
