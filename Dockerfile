@@ -9,7 +9,7 @@ RUN go mod download
 # Copy source
 COPY . .
 
-RUN go build -o main .
+RUN go build -o main cmd/fakeovirt/main.go
 
 EXPOSE 12346
 

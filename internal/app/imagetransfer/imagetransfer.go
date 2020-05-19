@@ -1,4 +1,4 @@
-package main
+package imagetransfer
 
 import (
 	"encoding/xml"
