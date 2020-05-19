@@ -1,14 +1,15 @@
 package main
 
 import (
-	"github.com/machacekondra/fakeovirt/internal/app/router"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/machacekondra/fakeovirt/internal/app/routes"
 )
 
 const (
-	defaultPort           = "12346"
+	defaultPort = "12346"
 )
 
 func main() {
@@ -16,12 +17,8 @@ func main() {
 	if !available {
 		port = defaultPort
 	}
-
-	mux:= router.CreateRouter()
-
-	err := http.ListenAndServeTLS(":"+port, "imageio.crt", "server.key", mux)
+	err := http.ListenAndServeTLS(":"+port, "imageio.crt", "server.key", routes.CreateRouter())
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
 }
-
