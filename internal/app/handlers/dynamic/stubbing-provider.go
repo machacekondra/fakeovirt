@@ -9,7 +9,7 @@ import (
 	"github.com/machacekondra/fakeovirt/internal/app/router"
 
 	"github.com/gorilla/pat"
-	"github.com/machacekondra/fakeovirt/api/stubbing"
+	"github.com/machacekondra/fakeovirt/pkg/api/stubbing"
 )
 
 // StubbingProvider allows for dynamic response stubbing
