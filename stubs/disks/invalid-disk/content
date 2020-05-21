@@ -17,6 +17,6 @@
 <total_size>@DISKSIZE</total_size>
 <wipe_after_delete>false</wipe_after_delete>
 <storage_domains>
-<storage_domain href="/ovirt-engine/api/storagedomains/invalid-disk" id="invalid-disk"/>
+<storage_domain href="/ovirt-engine/api/storagedomains/123" id="123"/>
 </storage_domains>
 </disk>
