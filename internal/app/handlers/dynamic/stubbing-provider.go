@@ -96,13 +96,20 @@ func (h *StubbingProvider) Stub() http.HandlerFunc {
 }
 
 func addStubbing(router *pat.Router, stub stubbing.Stubbing) {
-	code := stub.ResponseCode
-	if code == 0 {
-		code = http.StatusOK
+	var responses []*response
+	for _, rs := range stub.Responses {
+		resp := response{}
+		code := rs.ResponseCode
+		if code == 0 {
+			code = http.StatusOK
+		}
+		resp.responseCode = code
+		if rs.ResponseBody != nil {
+			resp.body = *rs.ResponseBody
+		}
+		resp.times = rs.Times
+		responses = append(responses, &resp)
 	}
-	handler := stubbingHandler{responseCode: code}
-	if stub.ResponseBody != nil {
-		handler.body = *stub.ResponseBody
-	}
-	router.Add(stub.Method, stub.Path, handler)
+
+	router.Add(stub.Method, stub.Path, newStubbingHandler(responses))
 }
