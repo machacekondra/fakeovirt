@@ -1,11 +1,12 @@
 package static
 
 import (
-	"github.com/machacekondra/fakeovirt/internal/app/imagetransfer"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/machacekondra/fakeovirt/internal/app/imagetransfer"
 )
 
 const (
@@ -21,6 +22,7 @@ const (
 
 var images = map[string]string{
 	"invalid": "invalid",
+	"cirros2": "cirros2",
 }
 
 // GetNamespace endpoint return the namespace which will be used by fake ovirt
