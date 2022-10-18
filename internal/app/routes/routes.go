@@ -25,7 +25,9 @@ func CreateRouter() *router.ReplacableDelegatingRouter {
 		"static-namespace": ConfigureNamespace,
 		"static-transfers": ConfigureImageTransfers,
 	}
-	dynamic.NewStubbingHandler(rootRouter).Configure(configurators)
+	s := dynamic.NewStubbingHandler(rootRouter)
+	s.Configure(configurators)
+	s.AddStaticStubs()
 	return rootRouter
 }
 

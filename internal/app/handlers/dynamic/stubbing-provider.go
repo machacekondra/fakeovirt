@@ -1,9 +1,13 @@
 package dynamic
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/machacekondra/fakeovirt/internal/app/router"
@@ -92,6 +96,40 @@ func (h *StubbingProvider) Stub() http.HandlerFunc {
 		}
 
 		w.WriteHeader(200)
+	}
+}
+
+// Stub adds new routes to the router held by the StubbingProvider
+func (h *StubbingProvider) AddStaticStubs() {
+	stubbings := stubbing.Stubbings{}
+	// err := json.NewDecoder(r.Body).Decode(&stubbings)
+	err := filepath.Walk("stubs",
+		func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			if !info.IsDir() && filepath.Ext(path) == ".json" {
+				new := stubbing.Stubbings{}
+				data, err := ioutil.ReadFile(path)
+				if err != nil {
+					return err
+				}
+				reader := bytes.NewReader(data)
+				err = json.NewDecoder(reader).Decode(&stubbings)
+				if err != nil {
+					return err
+				}
+				stubbings = append(stubbings, new...)
+			}
+			return nil
+		})
+
+	if err != nil {
+		fmt.Printf("Unable to decode: %v\n", err)
+	}
+
+	for _, stub := range stubbings {
+		addStubbing(h.router.Delegate(), stub)
 	}
 }
 
