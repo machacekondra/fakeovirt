@@ -1,6 +1,7 @@
 package static
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -47,39 +48,26 @@ func SsoToken(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("{\"access_token\":\"" + token + "\",\"scope\":\"\",\"exp\":\"9223372036854775807\",\"token_type\":\"bearer\"}"))
 }
 
-// OvirtVms host Vms endpotint
-func OvirtVms(w http.ResponseWriter, r *http.Request) {
-	//TODO: add support for searching with name and cluster name
-	setContentType(w, xmlContentType)
-	content, err := ioutil.ReadFile("stubs/vms/123/content")
+// Dynamic resource for unspecifed url
+func DynamicResource(w http.ResponseWriter, r *http.Request) {
+	// Remove from url /ovirt-engine/api prefix
+	path := strings.TrimPrefix(r.URL.Path, "/ovirt-engine/api")
+	fmt.Println(r.URL.Path)
+	if r.Header.Get("Accept") == jsonContentType {
+		path = fmt.Sprintf("stubs/%s/content.json", path)
+		setContentType(w, jsonContentType)
+	} else {
+		path = fmt.Sprintf("stubs/%s/content.xml", path)
+		setContentType(w, xmlContentType)
+	}
+
+	// Use the rest of url as path in to get the content
+	content, err := ioutil.ReadFile(path)
 	if err != nil {
+		fmt.Println(err)
 		w.Write([]byte("<error/>"))
 	}
-	w.Write([]byte("<vms>" + string(content) + "</vms>"))
-}
-
-func OvirtVMSubresource(vmsPrefix string) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		vmID := r.URL.Path[len(vmsPrefix):]
-		setContentType(w, xmlContentType)
-		content, err := ioutil.ReadFile("stubs/vms/" + vmID)
-		if err != nil {
-			w.Write([]byte("<error/>"))
-		}
-		w.Write(content)
-	}
-}
-
-func OvirtResoruceHandler(resource string) func(http.ResponseWriter, *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		id := r.URL.Query().Get(":id")
-		setContentType(w, xmlContentType)
-		content, err := ioutil.ReadFile("stubs/" + resource + "/" + id + "/content")
-		if err != nil {
-			w.Write([]byte("<error/>"))
-		}
-		w.Write(content)
-	}
+	w.Write(content)
 }
 
 // OvirtDisks host disks endpoint
@@ -93,6 +81,7 @@ func OvirtDisks(w http.ResponseWriter, r *http.Request) {
 	setContentType(w, xmlContentType)
 	content, err := ioutil.ReadFile("stubs/disks/" + id + "/content")
 	if err != nil {
+		fmt.Println(err)
 		w.Write([]byte("<error/>"))
 	}
 	w.Write([]byte(strings.ReplaceAll(string(content), "@DISKSIZE", diskSize)))
