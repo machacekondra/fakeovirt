@@ -108,7 +108,7 @@ func (h *StubbingProvider) AddStaticStubs() {
 			if err != nil {
 				return err
 			}
-			if !info.IsDir() && filepath.Ext(path) == ".json" {
+			if !info.IsDir() && filepath.Base(path) == "stub.json" {
 				new := stubbing.Stubbings{}
 				data, err := ioutil.ReadFile(path)
 				if err != nil {

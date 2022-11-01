@@ -50,11 +50,19 @@ func SsoToken(w http.ResponseWriter, r *http.Request) {
 
 // Dynamic resource for unspecifed url
 func DynamicResource(w http.ResponseWriter, r *http.Request) {
-	setContentType(w, jsonContentType)
 	// Remove from url /ovirt-engine/api prefix
 	path := strings.TrimPrefix(r.URL.Path, "/ovirt-engine/api")
+	fmt.Println(r.URL.Path)
+	if r.Header.Get("Accept") == jsonContentType {
+		path = fmt.Sprintf("stubs/%s/content.json", path)
+		setContentType(w, jsonContentType)
+	} else {
+		path = fmt.Sprintf("stubs/%s/content.xml", path)
+		setContentType(w, xmlContentType)
+	}
+
 	// Use the rest of url as path in to get the content
-	content, err := ioutil.ReadFile(fmt.Sprintf("stubs/%s/content", path))
+	content, err := ioutil.ReadFile(path)
 	if err != nil {
 		fmt.Println(err)
 		w.Write([]byte("<error/>"))

@@ -23,7 +23,6 @@ func CreateRouter() *router.ReplacableDelegatingRouter {
 		"static-vms":       ConfigureVms,
 		"static-sso":       ConfigureSSO,
 		"static-namespace": ConfigureNamespace,
-		"static-transfers": ConfigureImageTransfers,
 	}
 	s := dynamic.NewStubbingHandler(rootRouter)
 	s.Configure(configurators)
@@ -48,8 +47,6 @@ func ConfigureNamespace(router *pat.Router) {
 
 // ConfigureVms defines the default VM-related routes
 func ConfigureVms(router *pat.Router) {
-	router.HandleFunc(apiEndpoint("disks/{id}"), static.OvirtDisks)
-
 	// When the endpoint is not specified try to get stub from path
 	router.NotFoundHandler = http.HandlerFunc(static.DynamicResource)
 }
