@@ -11,6 +11,8 @@ COPY . .
 
 RUN go build -o main cmd/fakeovirt/main.go
 
-EXPOSE 12346
+ENV SERVICE=ovirt-imageio
+ENV PORT=30001
+EXPOSE 30001
 
 CMD ["./main"]
