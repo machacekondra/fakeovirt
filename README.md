@@ -1,6 +1,6 @@
 [![Fakeovirt Repository on Quay](https://quay.io/repository/kubev2v/fakeovirt/status "Fakeovirt Repository on Quay")](https://quay.io/repository/kubev2v/fakeovirt)
 
-This repository is used for testing of CDI imageio import.
+This repository is used for testing imports from oVirt using Forklift.
 
 # Deployment
 Deployment example on k8s:
