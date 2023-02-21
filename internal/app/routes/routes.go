@@ -33,6 +33,7 @@ func CreateRouter() *router.ReplacableDelegatingRouter {
 // ConfigureSSO configures the SSO endpoint
 func ConfigureSSO(router *pat.Router) {
 	router.HandleFunc("/ovirt-engine/sso/oauth/token", static.SsoToken)
+	router.HandleFunc("/ovirt-engine/services/sso-logout", static.SsoLogout)
 }
 
 // ConfigureImageTransfers configures the image transfers endpoint

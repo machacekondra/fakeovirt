@@ -48,6 +48,12 @@ func SsoToken(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("{\"access_token\":\"" + token + "\",\"scope\":\"\",\"exp\":\"9223372036854775807\",\"token_type\":\"bearer\"}"))
 }
 
+// SsoLogout endpoint fake the answer to SSO logout
+func SsoLogout(w http.ResponseWriter, r *http.Request) {
+	setContentType(w, jsonContentType)
+	w.Write([]byte("{ }"))
+}
+
 // Dynamic resource for unspecifed url
 func DynamicResource(w http.ResponseWriter, r *http.Request) {
 	// Remove from url /ovirt-engine/api prefix
