@@ -1,5 +1,11 @@
 ---
 language: go
+os: linux
+dist: noble
+
+arch:
+  - amd64
+  - arm64
 
 go:
   - 1.x
@@ -8,11 +14,20 @@ services:
   - docker
 
 before_install:
+  - uname -m
   - docker build . --tag machacekondra/fakeovirt
-  - docker run -e NAMESPACE=cdi-test -d -p 127.0.0.1:12346:12346 machacekondra/fakeovirt
+  - >-
+    test "$(docker image inspect --format '{{.Os}}/{{.Architecture}}' machacekondra/fakeovirt)"
+    = "linux/$TRAVIS_CPU_ARCH"
+  - docker run --name fakeovirt-ci -e NAMESPACE=cdi-test -d -p 127.0.0.1:12346:12346 machacekondra/fakeovirt
   - docker ps -a
 
 script:
-  - curl -k https://127.0.0.1:12346/namespace 2>/dev/null | jq .namespace | grep -q 'cdi-test'
+  - >-
+    curl -kfsS --connect-timeout 2 --max-time 5 --retry 10 --retry-delay 2 --retry-connrefused
+    https://127.0.0.1:12346/namespace | jq -e '.namespace == "cdi-test"'
   - curl -k https://127.0.0.1:12346/ovirt-engine/sso/oauth/token 2>/dev/null | jq .access_token | grep -q 'thessotoken'
   - sh -c '[ $(curl -k -s -o /dev/null -w "%{http_code}" https://127.0.0.1:12346/ovirt-engine/api/disks/123) -eq 200 ]'
+
+after_failure:
+  - docker logs fakeovirt-ci
