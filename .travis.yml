@@ -30,4 +30,7 @@ script:
   - sh -c '[ $(curl -k -s -o /dev/null -w "%{http_code}" https://127.0.0.1:12346/ovirt-engine/api/disks/123) -eq 200 ]'
 
 after_failure:
-  - docker logs fakeovirt-ci
+  - |
+    if docker container inspect fakeovirt-ci >/dev/null 2>&1; then
+      docker logs fakeovirt-ci
+    fi
